@@ -129,6 +129,17 @@ def post_delete(id):
         connect.commit()
         return redirect(url_for('landing'))
 
+# post: 전체 게시글 보기 기능
+@app.route('/post/list', methods=['GET'])
+def post_list():
+    cur.execute('SELECT * FROM post;')
+    posts = cur.fetchall()
+
+    cur.execute('SELECT count(*) FROM post;')
+    posts_count = cur.fetchall()
+
+    return render_template('post/post_list.html', posts = posts, posts_count = posts_count[0][0])
+
 if __name__ == '__main__':
     app.run()
 

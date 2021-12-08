@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nanum_market</title>
+  </head>
+  <body>
+    <div>
+        <div>전체 게시글 개수</div>
+        <div>{{posts_count}}</div>
+    </div>
+    {% for post in posts %}
+    {% if post[8] == False %}
+    <div>
+    {% else %}
+    <div>
+    {% endif %}
+      <div>
+        <div>작성자</div>
+        <div>{{post[1]}}</div>
+      </div>
+      <div>
+        <div>제목</div>
+        <div>{{post[2]}}</div>
+      </div>
+      <div>
+        <div>{{post[3]}}</div>
+      </div>
+      <div>
+        <div>위치</div>
+        <div>{{post[4]}}</div>
+      </div>
+      <div>
+      <div>
+          <img src="../../static/{{post[5]}}" width="175" height="175">
+      </div>
+      </div>
+      <div>
+        <div>작성일자</div>
+        <div>{{post[6].strftime("%Y년 %m월 %d일 %H시 %M분")}}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </body>
+</html>
