@@ -64,7 +64,9 @@ def signup():
     if request.method == 'POST':
         id = request.form['id']
         password = request.form['password']
-        cur.execute('INSERT INTO users VALUES(\'{}\', \'{}\');'.format(id, password))
+        phone = request.form['phone']
+        phone_public = request.form['phone_public'] 
+        cur.execute('INSERT INTO users VALUES(\'{}\', \'{}\', \'{}\', \'{}\');'.format(id, password, phone, phone_public))
         connect.commit()
         return redirect(url_for('login'))
 
