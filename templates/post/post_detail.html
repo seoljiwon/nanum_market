@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>nanum_market</title>
+    <script src="https://kit.fontawesome.com/c80b03cd64.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
     {% if post[8] == False %}
@@ -14,33 +16,43 @@
     {% endif %}
       <div>
         <div>작성자</div>
-        <div>{{post[1]}}</div>
+        <div>{{ post[1] }}</div>
       </div>
       <div>
         <div>제목</div>
-        <div>{{post[2]}}</div>
+        <div>{{ post[2] }}</div>
       </div>
       <div>
-        <div>{{post[3]}}</div>
+        <div>{{ post[3] }}</div>
       </div>
       <div>
         <div>위치</div>
-        <div>{{post[4]}}</div>
+        <div>{{ post[4] }}</div>
       </div>
       <div>
       <div>
-          <img src="../../static/{{post[5]}}" width="175" height="175">
+        <img src="/static/{{ post[5] }}" alt="" width = "100">
       </div>
       </div>
       <div>
         <div>작성일자</div>
-        <div>{{post[6].strftime("%Y년 %m월 %d일 %H시 %M분")}}</div>
+        <div>{{ post[6].strftime("%Y년 %m월 %d일 %H시 %M분") }}</div>
+      </div>
+      <div id="like-{{ post[0] }}">
+        {% if is_liked %}
+        <i class="fas fa-thumbs-up" type="submit" onclick="onClickLike('{{ post[0] }}')"></i>
+        {% else %}
+        <i class="far fa-thumbs-up" type="submit" onclick="onClickLike('{{ post[0] }}')"></i>
+        {% endif %}
+        <span id="like__count">{{ like_count }}</span>
       </div>
       <div>
-        <a href="update/{{post[0]}}">수정하기</a>
-        <form action="/post/delete/{{post[0]}}" method="POST">
+        <a href="update/{{ post[0] }}">수정하기</a>
+        <form action="/post/delete/{{ post[0] }}" method="POST">
         <input onclick="alert('정말 삭제하시겠습니까?')" type="submit" value="delete">
       </div>
     </div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename = 'js/postLike.js') }}"></script>
   </body>
 </html>

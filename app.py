@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, session
+from flask import Flask, render_template, redirect, jsonify, request, session
 from flask.helpers import url_for
 import psycopg2
 import os
@@ -94,10 +94,24 @@ def post_create():
 # post: 특정 게시글 보기 기능
 @app.route('/post/<id>', methods=['GET'])
 def post_detail(id):
+    if 'id' in session:
+        user_id = session['id']
+
     cur.execute('SELECT * FROM post WHERE id = \'{}\';'.format(id))
     post = cur.fetchall()
 
-    return render_template('post/post_detail.html', post = post[0])
+    cur.execute('SELECT count(user_id) FROM post_like GROUP BY post_id HAVING post_id = \'{}\';'.format(id))
+    like_count = cur.fetchall()
+    if not like_count:
+        like_count = [[0 for col in range(1)] for row in range(1)]
+        like_count[0][0] = 0
+
+    print(like_count)
+    
+    cur.execute('SELECT * FROM post_like WHERE post_id = \'{}\' and user_id = \'{}\';'.format(id, user_id))
+    is_liked = (len(cur.fetchall()) != 0)
+
+    return render_template('post/post_detail.html', post = post[0], like_count = like_count[0][0], is_liked = is_liked)
 
 # post: 게시글 수정 기능
 @app.route('/post/update/<id>', methods=['GET', 'POST'])
@@ -139,6 +153,31 @@ def post_list():
     posts_count = cur.fetchall()
 
     return render_template('post/post_list.html', posts = posts, posts_count = posts_count[0][0])
+
+# post: 게시글 좋아요 기능
+@app.route('/post/<id>/like', methods=['POST'])
+def post_like(id):
+    if request.method == 'POST':
+        if 'id' in session:
+            user_id = session['id']
+
+            cur.execute('SELECT * FROM post_like WHERE post_id = \'{}\' and user_id = \'{}\';'.format(id, user_id))
+            is_liked = (len(cur.fetchall()) != 0)
+
+            if is_liked:
+                cur.execute('DELETE FROM post_like WHERE post_id = \'{}\' and user_id = \'{}\';'.format(id, user_id))
+                connect.commit()
+                
+            else:
+                cur.execute('INSERT INTO post_like (post_id, user_id) VALUES (\'{}\', \'{}\');'.format(id, user_id))
+                connect.commit()
+                
+            is_liked = not is_liked
+            login_required = False
+            return jsonify(post_id = id, is_liked = is_liked, login_required = login_required)
+        else:
+            login_required = True
+            return jsonify(login_required = login_required)
 
 if __name__ == '__main__':
     app.run()
