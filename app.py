@@ -99,6 +99,35 @@ def post_detail(id):
 
     return render_template('post/post_detail.html', post = post[0])
 
+# post: 게시글 수정 기능
+@app.route('/post/update/<id>', methods=['GET', 'POST'])
+def post_update(id):
+    if request.method == 'POST':
+        if 'id' in session:
+            title = request.form['title']
+            content = request.form['content']
+            location = request.form['location']
+            image = request.files['image']
+            image.save('static/uploads/' + secure_filename(image.filename))
+
+            is_closed = request.form['is_closed']
+            cur.execute('UPDATE post SET title = \'{}\', content = \'{}\', location = \'{}\', image = \'{}\', is_closed = \'{}\', updated_at = now() WHERE id = \'{}\' RETURNING id;'.format(title, content, location, 'uploads/'+secure_filename(image.filename), is_closed, id))
+            connect.commit()
+
+            post_id = cur.fetchall()
+            return redirect(url_for('post_detail', id = post_id[0]))
+
+    cur.execute('SELECT * FROM post WHERE id = \'{}\';'.format(id))
+    post = cur.fetchall()
+    return render_template('post/post_update.html', post = post[0])
+
+# post: 게시글 삭제 기능
+@app.route('/post/delete/<id>', methods=['POST'])
+def post_delete(id):
+    if 'id' in session:
+        cur.execute('DELETE FROM post WHERE id = \'{}\';'.format(id))
+        connect.commit()
+        return redirect(url_for('landing'))
 
 if __name__ == '__main__':
     app.run()

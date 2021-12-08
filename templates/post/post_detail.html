@@ -36,6 +36,11 @@
         <div>작성일자</div>
         <div>{{post[6].strftime("%Y년 %m월 %d일 %H시 %M분")}}</div>
       </div>
+      <div>
+        <a href="update/{{post[0]}}">수정하기</a>
+        <form action="/post/delete/{{post[0]}}" method="POST">
+        <input onclick="alert('정말 삭제하시겠습니까?')" type="submit" value="delete">
+      </div>
     </div>
   </body>
 </html>

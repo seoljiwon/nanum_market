@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nanum_market</title>
+  </head>
+  <body>
+    <form action="/post/update/{{post[0]}}" method="POST" enctype = "multipart/form-data">
+        <label for="title">title</label>
+        <input id="title" type="text" name="title" value="{{post[1]}}">
+
+        <label for="content">content</label>
+        <input id="content" type="text" name="content" value="{{post[2]}}">
+
+        <label for="location">location</label>
+        <input id="location" type="text" name="location" value="{{post[3]}}">
+
+        <label for="image">image</label>
+        <input type="file" id="image" name="image" accept="image/png, image/jpeg">
+
+        <label for="is_closed">나눔 완료</label>
+        <input type="radio" id="is_closed" name="is_closed">
+
+        <input type="submit" name="send" value="update">
+  </body>
+</html>
+
