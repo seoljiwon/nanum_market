@@ -57,6 +57,18 @@ def logout():
     session.pop('id', None)
     return redirect(url_for('landing'))
 
+# users: 회원가입 기능
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        id = request.form['id']
+        password = request.form['password']
+        cur.execute('INSERT INTO users VALUES(\'{}\', \'{}\');'.format(id, password))
+        connect.commit()
+        return redirect(url_for('login'))
+
+    return render_template('users/signup.html')
+
 
 if __name__ == '__main__':
     app.run()
