@@ -99,6 +99,7 @@ def post_detail(id):
 
     return render_template('post/post_detail.html', post = post[0])
 
+
 if __name__ == '__main__':
     app.run()
 
