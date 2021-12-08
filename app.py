@@ -1,14 +1,18 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, request, session
+from flask.helpers import url_for
 import psycopg2
 import os
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True)
 
-DB_CONFIG = os.getenv('DB_CONFIG')
-
 app = Flask(__name__)
+# 세션에서 사용될 SECRET_KEY 설정
+SECRET_KEY = os.getenv('SECRET_KEY')
+app.secret_key = SECRET_KEY
 
+# postgres DB 연결
+DB_CONFIG = os.getenv('DB_CONFIG')
 connect = psycopg2.connect(DB_CONFIG)
 cur = connect.cursor()
 
@@ -29,9 +33,29 @@ cur.execute('CREATE TABLE user_like (id SERIAL, user_id varchar(20), nice_user_i
 connect.commit()
 
 
+# 메인 랜딩 페이지
 @app.route('/')
 def landing():
+    if 'id' in session:
+        session_id = session['id']
+        return render_template('landing.html', session_id = session_id)
+    
     return render_template('landing.html')
+
+# users: 로그인 기능
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        session['id'] = request.form['id']
+        return redirect(url_for('landing'))
+
+    return render_template('users/login.html')
+    
+# users: 로그아웃 기능
+@app.route('/logout')
+def logout():
+    session.pop('id', None)
+    return redirect(url_for('landing'))
 
 
 if __name__ == '__main__':
