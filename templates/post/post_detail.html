@@ -49,10 +49,28 @@
       <div>
         <a href="update/{{ post[0] }}">수정하기</a>
         <form action="/post/delete/{{ post[0] }}" method="POST">
-        <input onclick="alert('정말 삭제하시겠습니까?')" type="submit" value="delete">
+          <input onclick="alert('정말 삭제하시겠습니까?')" type="submit" value="delete">
+        </form>
+      </div>
+
+      <div class="post__comment">
+        <div>
+            <textarea id="comment__value" type="text" placeholder="나눔 제공자와 소통하세요!"></textarea>
+            <input onclick="onClickCreateComment('{{ post[0] }}')" type="submit" value="댓글 작성">
+        </div>
+        <div id="comments">
+          {% for comment in comments %}
+          <div class="comment-{{ comment[0] }}">
+              <span class="comment__writer">{{ comment[1] }}</span>
+              <span class="comment__date">{{ comment[4].strftime("%m월 %d일") }}</span>
+              <span class="comment__content">{{ comment[3] }}</span>
+          </div>
+          {% endfor %}
+        </div>
       </div>
     </div>
 
     <script type="text/javascript" src="{{ url_for('static', filename = 'js/postLike.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'js/postComment.js') }}"></script>
   </body>
 </html>

@@ -102,6 +102,7 @@ def post_detail(id):
     cur.execute('SELECT * FROM post WHERE id = \'{}\';'.format(id))
     post = cur.fetchall()
 
+    # 좋아요 정보
     cur.execute('SELECT count(user_id) FROM post_like GROUP BY post_id HAVING post_id = \'{}\';'.format(id))
     like_count = cur.fetchall()
     if not like_count:
@@ -113,7 +114,10 @@ def post_detail(id):
     cur.execute('SELECT * FROM post_like WHERE post_id = \'{}\' and user_id = \'{}\';'.format(id, user_id))
     is_liked = (len(cur.fetchall()) != 0)
 
-    return render_template('post/post_detail.html', post = post[0], like_count = like_count[0][0], is_liked = is_liked)
+    # 댓글 정보
+    cur.execute('SELECT * FROM comment WHERE post_id = \'{}\' and user_id = \'{}\';'.format(id, user_id))
+    comments = cur.fetchall()
+    return render_template('post/post_detail.html', post = post[0], like_count = like_count[0][0], is_liked = is_liked, comments = comments)
 
 # post: 게시글 수정 기능
 @app.route('/post/update/<id>', methods=['GET', 'POST'])
@@ -180,6 +184,26 @@ def post_like(id):
         else:
             login_required = True
             return jsonify(login_required = login_required)
+
+# post: 게시글 댓글 기능
+@app.route('/post/<id>/comment/create', methods=['POST'])
+def post_comment_create(id):
+    if request.method == 'POST':
+        if 'id' in session:
+            user_id = session['id']
+            content = request.get_json()['content']
+
+            cur.execute('INSERT INTO comment (post_id, user_id, content) VALUES (\'{}\', \'{}\', \'{}\') RETURNING id;'.format(id, user_id, content))
+            connect.commit()
+
+            comment_id = cur.fetchall()
+
+            login_required = False 
+            return jsonify(post_id = id, user_id = user_id, comment_id = comment_id, content = content, login_required = login_required)
+        else:
+            login_required = True
+            return jsonify(login_required = login_required)
+
 
 if __name__ == '__main__':
     app.run()
