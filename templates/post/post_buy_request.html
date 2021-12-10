@@ -8,10 +8,10 @@
   </head>
   <body>
     <form action="/post/{{ id }}/buy/request" method="POST" enctype = "multipart/form-data">
-        <label for="state">state</label>
+        <label for="status">status</label>
         
         <label for="is_waiting">나눔 받기 요청</label>
-        <input id="is_waiting" type="radio" name="state" value="is_waiting" checked>
+        <input id="is_waiting" type="radio" name="status" value="is_waiting" checked>
 
         <input type="submit" name="send" value="request">
   </body>
