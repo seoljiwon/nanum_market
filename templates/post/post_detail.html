@@ -30,13 +30,17 @@
         <div>{{ post[4] }}</div>
       </div>
       <div>
-      <div>
-        <img src="/static/{{ post[5] }}" alt="" width = "100">
-      </div>
+        <div>
+          <img src="/static/{{ post[5] }}" alt="" width = "100">
+        </div>
       </div>
       <div>
         <div>작성일자</div>
         <div>{{ post[6].strftime("%Y년 %m월 %d일 %H시 %M분") }}</div>
+      </div>
+      <div>
+        <div>가격</div>
+        <div>무료 (택배 배송 시, 배송료 별도)</div>
       </div>
       <div id="like-{{ post[0] }}">
         {% if is_liked %}
@@ -47,10 +51,13 @@
         <span id="like__count">{{ like_count }}</span>
       </div>
       <div>
-        <a href="update/{{ post[0] }}">수정하기</a>
-        <form action="/post/delete/{{ post[0] }}" method="POST">
+        <a href="{{ post[0] }}/update">수정하기</a>
+        <form action="/post/{{ post[0] }}/delete" method="POST">
           <input onclick="alert('정말 삭제하시겠습니까?')" type="submit" value="delete">
         </form>
+      </div>
+      <div>
+        <a href="{{ post[0] }}/buy">구매하기</a>
       </div>
 
       <div class="post__comment">
