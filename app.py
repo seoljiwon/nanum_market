@@ -18,20 +18,20 @@ connect = psycopg2.connect(DB_CONFIG)
 cur = connect.cursor()
 
 # 테이블 생성
-cur.execute('DROP TABLE user_like;')
-cur.execute('DROP TABLE post_like;')
-cur.execute('DROP TABLE comment;')
-cur.execute('DROP TABLE buy;')
-cur.execute('DROP TABLE post;')
-cur.execute('DROP TABLE users;')
+# cur.execute('DROP TABLE user_like;')
+# cur.execute('DROP TABLE post_like;')
+# cur.execute('DROP TABLE comment;')
+# cur.execute('DROP TABLE buy;')
+# cur.execute('DROP TABLE post;')
+# cur.execute('DROP TABLE users;')
 
-cur.execute('CREATE TABLE users (id varchar(20), password varchar(20), phone numeric(11, 0), phone_public boolean, primary key(id));')
-cur.execute('CREATE TABLE post (id SERIAL, user_id varchar(20), title varchar(20) not null, content text, location text, image text, created_at timestamp default now(), updated_at timestamp default now(), is_closed boolean, primary key(id), foreign key (user_id) references users on delete cascade);')
-cur.execute('CREATE TABLE comment (id SERIAL, user_id varchar(20), post_id SERIAL, content text, created_at timestamp default now(), primary key(id), foreign key (user_id) references users on delete cascade, foreign key (post_id) references post on delete cascade);')
-cur.execute('CREATE TABLE buy (id SERIAL, user_id varchar(20), post_id SERIAL, created_at timestamp default now(), status varchar(10) check (status in (\'is_posted\', \'is_waiting\', \'is_done\')), sending_method varchar(10) check (sending_method in (\'delivery\', \'receipt\')),primary key(id), foreign key (user_id) references users on delete cascade, foreign key (post_id) references post on delete cascade);')
-cur.execute('CREATE TABLE post_like (id SERIAL, user_id varchar(20), post_id SERIAL, primary key(id), foreign key (user_id) references users on delete cascade, foreign key (post_id) references post on delete cascade);')
-cur.execute('CREATE TABLE user_like (id SERIAL, user_id varchar(20), nice_user_id varchar(20), primary key(id), foreign key (user_id) references users on delete cascade, foreign key (nice_user_id) references users on delete cascade);')
-connect.commit()
+# cur.execute('CREATE TABLE users (id varchar(20), password varchar(20), phone numeric(11, 0), phone_public boolean, primary key(id));')
+# cur.execute('CREATE TABLE post (id SERIAL, user_id varchar(20), title varchar(20) not null, content text, location text, image text, created_at timestamp default now(), updated_at timestamp default now(), is_closed boolean, primary key(id), foreign key (user_id) references users on delete cascade);')
+# cur.execute('CREATE TABLE comment (id SERIAL, user_id varchar(20), post_id SERIAL, content text, created_at timestamp default now(), primary key(id), foreign key (user_id) references users on delete cascade, foreign key (post_id) references post on delete cascade);')
+# cur.execute('CREATE TABLE buy (id SERIAL, user_id varchar(20), post_id SERIAL, created_at timestamp default now(), status varchar(10) check (status in (\'is_posted\', \'is_waiting\', \'is_done\')), sending_method varchar(10) check (sending_method in (\'delivery\', \'receipt\')),primary key(id), foreign key (user_id) references users on delete cascade, foreign key (post_id) references post on delete cascade);')
+# cur.execute('CREATE TABLE post_like (id SERIAL, user_id varchar(20), post_id SERIAL, primary key(id), foreign key (user_id) references users on delete cascade, foreign key (post_id) references post on delete cascade);')
+# cur.execute('CREATE TABLE user_like (id SERIAL, user_id varchar(20), nice_user_id varchar(20), primary key(id), foreign key (user_id) references users on delete cascade, foreign key (nice_user_id) references users on delete cascade);')
+# connect.commit()
 
 
 # 메인 랜딩 페이지
@@ -39,7 +39,12 @@ connect.commit()
 def landing():
     if 'id' in session:
         session_id = session['id']
-        return render_template('landing.html', session_id = session_id)
+        cur.execute('SELECT count(*) FROM post, buy WHERE post.id = buy.post_id and buy.user_id = \'{}\' and buy.status=\'is_waiting\';'.format(session_id))
+        buy_waiting_count = cur.fetchall()
+        cur.execute('SELECT count(*) FROM post natural join post_like WHERE post_like.user_id = \'{}\';'.format(session_id))
+        post_like_count = cur.fetchall()
+
+        return render_template('landing.html', session_id = session_id, buy_waiting_count = buy_waiting_count[0][0], post_like_count = post_like_count[0][0])
     
     return render_template('landing.html')
 

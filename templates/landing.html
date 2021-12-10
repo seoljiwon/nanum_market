@@ -10,6 +10,8 @@
     <div>This is landing</div>
     {% if session_id %}
     <div>{{session_id}}님 환영합니다.</div>
+    <div>보낸 나눔 요청(대기 중): {{buy_waiting_count}}개</div>
+    <div>좋아요한 게시글: {{post_like_count}}개</div>
     {% else %}
     <div>로그인이 필요합니다.</div>
     {% endif %}
