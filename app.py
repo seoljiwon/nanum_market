@@ -72,6 +72,31 @@ def signup():
 
     return render_template('users/signup.html')
 
+# user_like: 유저 좋아요 기능
+@app.route('/user/<id>/like', methods=['POST'])
+def user_like(id):
+    if request.method == 'POST':
+        if 'id' in session:
+            user_id = session['id']
+
+            cur.execute('SELECT * FROM user_like WHERE nice_user_id = \'{}\' and user_id = \'{}\';'.format(id, user_id))
+            is_liked = (len(cur.fetchall()) != 0)
+
+            if is_liked:
+                cur.execute('DELETE FROM user_like WHERE nice_user_id = \'{}\' and user_id = \'{}\';'.format(id, user_id))
+                connect.commit()
+                
+            else:
+                cur.execute('INSERT INTO user_like (nice_user_id, user_id) VALUES (\'{}\', \'{}\');'.format(id, user_id))
+                connect.commit()
+                
+            is_liked = not is_liked
+            login_required = False
+            return jsonify(nice_user_id = id, is_liked = is_liked, login_required = login_required)
+        else:
+            login_required = True
+            return jsonify(login_required = login_required)
+
 # post: 게시글 작성 기능
 @app.route('/post/create', methods=['GET', 'POST'])
 def post_create():
