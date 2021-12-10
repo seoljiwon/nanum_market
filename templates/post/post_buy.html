@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nanum_market</title>
+  </head>
+  <body>
+    <form action="/post/{{ id }}/buy" method="POST" enctype = "multipart/form-data">
+        <label for="sending_method">sending_method</label>
+        
+        <label for="receipt">직접 수령</label>
+        <input id="receipt" type="radio" name="sending_method" value="receipt" checked>
+
+        <label for="delivery">택배 배송</label>
+        <input id="delivery" type="radio" name="sending_method" value="delivery">
+
+        <input type="submit" name="send" value="buy">
+  </body>
+</html>

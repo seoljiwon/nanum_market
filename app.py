@@ -120,7 +120,7 @@ def post_detail(id):
     return render_template('post/post_detail.html', post = post[0], like_count = like_count[0][0], is_liked = is_liked, comments = comments)
 
 # post: 게시글 수정 기능
-@app.route('/post/update/<id>', methods=['GET', 'POST'])
+@app.route('/post/<id>/update', methods=['GET', 'POST'])
 def post_update(id):
     if request.method == 'POST':
         if 'id' in session:
@@ -131,6 +131,7 @@ def post_update(id):
             image.save('static/uploads/' + secure_filename(image.filename))
 
             is_closed = request.form['is_closed']
+            
             cur.execute('UPDATE post SET title = \'{}\', content = \'{}\', location = \'{}\', image = \'{}\', is_closed = \'{}\', updated_at = now() WHERE id = \'{}\' RETURNING id;'.format(title, content, location, 'uploads/'+secure_filename(image.filename), is_closed, id))
             connect.commit()
 
@@ -142,7 +143,7 @@ def post_update(id):
     return render_template('post/post_update.html', post = post[0])
 
 # post: 게시글 삭제 기능
-@app.route('/post/delete/<id>', methods=['POST'])
+@app.route('/post/<id>/delete', methods=['POST'])
 def post_delete(id):
     if 'id' in session:
         cur.execute('DELETE FROM post WHERE id = \'{}\';'.format(id))
@@ -160,7 +161,7 @@ def post_list():
 
     return render_template('post/post_list.html', posts = posts, posts_count = posts_count[0][0])
 
-# post: 게시글 좋아요 기능
+# post_like: 게시글 좋아요 기능
 @app.route('/post/<id>/like', methods=['POST'])
 def post_like(id):
     if request.method == 'POST':
@@ -185,7 +186,7 @@ def post_like(id):
             login_required = True
             return jsonify(login_required = login_required)
 
-# post: 게시글 댓글 기능
+# comment: 게시글 댓글 기능
 @app.route('/post/<id>/comment/create', methods=['POST'])
 def post_comment_create(id):
     if request.method == 'POST':
@@ -204,6 +205,41 @@ def post_comment_create(id):
             login_required = True
             return jsonify(login_required = login_required)
 
+# buy: 나눔 받기 기능 - 나눔 방법 선택
+@app.route('/post/<id>/buy', methods=['GET', 'POST'])
+def post_buy(id):
+    if request.method == 'POST':
+        if 'id' in session:
+            user_id = session['id']
+            sending_method = request.form['sending_method']
+            state = 'is_posted'
+
+            cur.execute('INSERT INTO buy (post_id, user_id, state, sending_method) VALUES (\'{}\', \'{}\', \'{}\', \'{}\') RETURNING id;'.format(id, user_id, state, sending_method))
+            connect.commit()
+
+            buy_id = cur.fetchall()
+            return redirect(url_for('post_buy_request', id = buy_id[0]))
+
+    return render_template('post/post_buy.html', id = id)
+
+# buy: 나눔 받기 기능 - 나눔 받기 요청
+@app.route('/post/<id>/buy/request', methods=['GET', 'POST'])
+def post_buy_request(id):
+    if request.method == 'POST':
+        if 'id' in session:
+            user_id = session['id']
+            state = request.form['state']
+            
+            cur.execute('UPDATE buy SET state = \'{}\' WHERE post_id = \'{}\' and user_id = \'{}\';'.format(state, id, user_id))
+            connect.commit()
+
+            return redirect(url_for('post_buy_request_waiting', id = id))
+
+    return render_template('post/post_buy_request.html', id = id)
+
+@app.route('/post/<id>/buy/request/waiting', methods=['GET'])
+def post_buy_request_waiting(id):
+    return render_template('post/post_but_request_waiting.html')
 
 if __name__ == '__main__':
     app.run()
