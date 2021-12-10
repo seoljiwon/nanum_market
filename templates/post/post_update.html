@@ -7,15 +7,16 @@
     <title>nanum_market</title>
   </head>
   <body>
-    <form action="/post/update/{{post[0]}}" method="POST" enctype = "multipart/form-data">
+    <form action="/post/{{ post[0] }}/update" method="POST" enctype = "multipart/form-data">
+        {{post}}
         <label for="title">title</label>
-        <input id="title" type="text" name="title" value="{{post[1]}}">
+        <input id="title" type="text" name="title" value="{{post[2]}}">
 
         <label for="content">content</label>
-        <input id="content" type="text" name="content" value="{{post[2]}}">
+        <input id="content" type="text" name="content" value="{{post[3]}}">
 
         <label for="location">location</label>
-        <input id="location" type="text" name="location" value="{{post[3]}}">
+        <input id="location" type="text" name="location" value="{{post[4]}}">
 
         <label for="image">image</label>
         <input type="file" id="image" name="image" accept="image/png, image/jpeg">
